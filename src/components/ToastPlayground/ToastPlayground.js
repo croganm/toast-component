@@ -1,11 +1,10 @@
 import React from "react";
 
-import { guidGenerator } from "../../utils";
-
 import Button from "../Button";
 import ToastShelf from "../ToastShelf";
 
 import styles from "./ToastPlayground.module.css";
+import { ToastContext } from "../ToastProvider/ToastProvider";
 
 const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
 
@@ -16,35 +15,7 @@ function onChangeValue(event, setter) {
 function ToastPlayground() {
 	const [variant, setVariant] = React.useState("notice");
 	const [message, setMessage] = React.useState("");
-	const [toastArray, setToastArray] = React.useState([
-		{
-			id: guidGenerator(),
-			variant: "notice",
-			message: "This is a notice toast!",
-		},
-		{
-			id: guidGenerator(),
-
-			variant: "warning",
-			message: "This is a warning toast!",
-		},
-	]);
-
-	function addToast(event) {
-		event.preventDefault();
-    if(toastArray.length === 3) {
-      removeToast(toastArray[0].id);
-    }
-		// TODO Add toast to array here
-		const id = guidGenerator();
-		setToastArray((prev) => [...prev, { id, variant, message }]);
-		setMessage("");
-	}
-
-	function removeToast(id) {
-		// TODO Remove toast from array here
-		setToastArray((prev) => prev.filter((toast) => toast.id !== id));
-	}
+	const { addToast } = React.useContext(ToastContext);
 
 	return (
 		<div className={styles.wrapper}>
@@ -53,9 +24,12 @@ function ToastPlayground() {
 				<h1>Toast Playground</h1>
 			</header>
 
-			<ToastShelf toastArray={toastArray} removeToast={removeToast} />
+			<ToastShelf />
 
-			<form onSubmit={(e) => addToast(e)} className={styles.controlsWrapper}>
+			<form
+				onSubmit={(e) => addToast(e, message, variant, setMessage)}
+				className={styles.controlsWrapper}
+			>
 				<div className={styles.row}>
 					<label
 						htmlFor="message"
